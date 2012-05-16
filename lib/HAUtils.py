@@ -6,6 +6,9 @@
 import sys
 import os
 
+import MiscUtils as ut
+
+
 def get_data_dir():
     if 'HABRA_DB_PATH' in os.environ:
         return os.path.realpath(os.environ['HABRA_DB_PATH'])
@@ -26,5 +29,6 @@ def get_users_dir():
 
 def get_reports_dir():
     thedir = os.path.join(get_data_dir(), 'reports')
+    ut.createdir(thedir)    
     assert os.path.exists(thedir)
     return thedir
