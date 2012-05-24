@@ -1,12 +1,16 @@
+# -*- coding: utf-8 -*-
 from copy import deepcopy
 from igraph import *
 
-sys.path.append('../lib')
-import MiscUtils as ut
+sys.path.append('..')
+from lib import MiscUtils as ut
+from lib import HAUtils as ha
+from lib import SmartObject as so
+
 
 def get_comment_tree(postpath):
     url_to_parse = 'http://habrahabr.ru/' + postpath
-    root    = ut.doc4url(url_to_parse)
+    root = ut.doc4url(url_to_parse)
     if not root:
         return None
 
@@ -14,8 +18,15 @@ def get_comment_tree(postpath):
     print author
     
     comment_root_tree = {}
-    
+    ##  Словарь вложенных словарей
+    ##  автор
+    ##  |→ автор_комментарария
+    ##      |→ автор подкомментария
     def dfs_process(node, tree):
+        """
+        Рекурсивно идет вглубь от node
+        и набивает словарь-дерево tree
+        """
         print node.get('id')
         comments = node.xpath('.//div[@id="comments" or @class="reply_comments"]')[0]
         for comment in comments.xpath('./div[@class="comment_item"]'):
@@ -29,10 +40,9 @@ def get_comment_tree(postpath):
     comment_tree = {author: comment_root_tree}
     print 'tree:', comment_tree
     
-    thedir = os.path.join('../data/posts', os.path.split(postpath)[0])
-    ut.createdir(thedir)
-    
-    filename = os.path.join('../data/posts', postpath) + '.dat'
+    thepostsdir = os.path.join(ha.get_data_dir(), 'posts')
+    filename = os.path.join(thepostsdir, postpath) + '.dat'
+    ut.createdir(os.path.split(filename)[0])
     ut.data2pickle(comment_tree, filename)
 
 
